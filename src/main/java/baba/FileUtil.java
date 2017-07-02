@@ -3,28 +3,94 @@ package baba;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream; 
+import java.io.OutputStream;
+import java.util.Iterator; 
 
 public class FileUtil {
 	
-	public static String read(String fileLoc){
+	public static String readAsString(String fileLoc){
 		File file = new File(fileLoc);
 		StringBuilder sb = new StringBuilder();
 		if(file.exists()){
 			try(BufferedReader br = new BufferedReader(new FileReader(file))){
-				String line = br.readLine();
-				if(line != null){
-					sb.append(line).append("\n");
+				while(true){
+					String line = br.readLine();
+					if(line != null){
+						sb.append(line).append("\n");
+					}
+					if(line == null){
+						break;
+					}
 				}
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		return sb.toString();
+	}
+	
+	public static class FileIterable implements Iterable<String>{
+		
+		private Iterator<String> iterator;
+		
+		public FileIterable(Iterator<String> iterator){
+			this.iterator = iterator;
+		}
+
+		@Override
+		public Iterator<String> iterator() {
+			return iterator;
+		}
+		
+	}
+	
+	public static class FileIterator implements Iterator<String>{
+		private BufferedReader br;
+		private String token;
+		public FileIterator(BufferedReader br) {
+			this.br = br;
+		}
+		@Override
+		public boolean hasNext() {
+			try {
+				token = br.readLine();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			} finally{
+				if(token==null){
+					try {
+						br.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+	
+					}
+				}
+			}
+			return token!=null;
+		}
+
+		@Override
+		public String next() {
+			return token;
+		}
+		
+	}
+	
+	public static Iterable<String> read(String fileLoc){
+		File file = new File(fileLoc);
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader(file));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		return new FileIterable(new FileIterator(br));
 	}
 	
 	public static void move(String srcFile, String distFile){
@@ -140,8 +206,15 @@ public class FileUtil {
 		
 	}
 	
+	public static File file(String loc){
+		return new File(loc);
+	}
+	
 	public static void main(String args[]){
-		moveDir("D:/tmp/hadoop-Ace", "D:/tmp/baba");
+		for(String line : read("D:/LMMSplugins/readme.txt")){
+			System.out.println(line);
+		}
+		
 	}
 	
 
