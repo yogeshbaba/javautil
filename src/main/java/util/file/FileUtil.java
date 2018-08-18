@@ -1,4 +1,4 @@
-package baba;
+package util.file;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,11 +11,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator; 
 
+/**
+ * Provides utility methods that help simplifying file operations
+ * @author srini
+ *
+ */
 public class FileUtil {
 	
 	public static String readAsString(String fileLoc){
 		File file = new File(fileLoc);
 		StringBuilder sb = new StringBuilder();
+		String content = "";
 		if(file.exists()){
 			try(BufferedReader br = new BufferedReader(new FileReader(file))){
 				while(true){
@@ -26,13 +32,17 @@ public class FileUtil {
 					if(line == null){
 						break;
 					}
-				}
-				
+				}				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			if(sb.length()>1 && sb.substring(sb.length()-1, sb.length()).equals("\n")) {
+				content = sb.substring(0, sb.length()-1);
+			} else {
+				content = sb.toString();
+			}
 		}
-		return sb.toString();
+		return content;
 	}
 	
 	public static class FileIterable implements Iterable<String>{
@@ -68,7 +78,6 @@ public class FileUtil {
 						br.close();
 					} catch (IOException e) {
 						e.printStackTrace();
-	
 					}
 				}
 			}
@@ -82,6 +91,11 @@ public class FileUtil {
 		
 	}
 	
+	/**
+	 * Allows to read a file using foreach and internally users Buffered reader to process the file
+	 * @param fileLoc
+	 * @return
+	 */
 	public static Iterable<String> read(String fileLoc){
 		File file = new File(fileLoc);
 		BufferedReader br;
@@ -210,12 +224,4 @@ public class FileUtil {
 		return new File(loc);
 	}
 	
-	public static void main(String args[]){
-		for(String line : read("D:/LMMSplugins/readme.txt")){
-			System.out.println(line);
-		}
-		
-	}
-	
-
 }
