@@ -1,6 +1,7 @@
 package baba;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
@@ -9,6 +10,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import util.file.FileResponse;
 import util.file.FileUtil;
 
 
@@ -47,12 +49,16 @@ public class FileUtilTest {
 
 	@Test
 	public void testReadAsString() {
-		Assert.assertEquals(singelineContent,FileUtil.readAsString(singleLineFile));
+		FileResponse response = FileUtil.readAsString(singleLineFile);
+		Assert.assertEquals(true, response.isSuccess());
+		Assert.assertEquals(singelineContent,response.getContent());
 	}
 	
 	@Test
 	public void testReadAsString_MultiLine() {
-		Assert.assertEquals(multiLineContent,FileUtil.readAsString(multiLineFileName));
+		FileResponse response = FileUtil.readAsString(multiLineFileName);
+		Assert.assertEquals(true, response.isSuccess());
+		Assert.assertEquals(multiLineContent, response.getContent());
 	}
 	
 	@Test
@@ -63,5 +69,12 @@ public class FileUtilTest {
 			Assert.assertEquals(content[i],line);
 			i++;
 		}
+	}
+	
+	@Test
+	public void testReadAsString_NoFile() {
+		FileResponse response = FileUtil.readAsString("baba.txt");
+		Assert.assertEquals(false, response.isSuccess());
+		Assert.assertNull(response.getContent());
 	}
 }

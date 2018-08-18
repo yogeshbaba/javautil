@@ -18,7 +18,7 @@ import java.util.Iterator;
  */
 public class FileUtil {
 	
-	public static String readAsString(String fileLoc){
+	public static FileResponse readAsString(String fileLoc){
 		File file = new File(fileLoc);
 		StringBuilder sb = new StringBuilder();
 		String content = "";
@@ -34,15 +34,17 @@ public class FileUtil {
 					}
 				}				
 			} catch (IOException e) {
-				e.printStackTrace();
+				return FileResponse.newInstance(false, e, null);
 			}
 			if(sb.length()>1 && sb.substring(sb.length()-1, sb.length()).equals("\n")) {
 				content = sb.substring(0, sb.length()-1);
 			} else {
 				content = sb.toString();
 			}
+		} else {
+			return FileResponse.newInstance(false, new FileNotFoundException(), null);
 		}
-		return content;
+		return FileResponse.newInstance(true, null, content);
 	}
 	
 	public static class FileIterable implements Iterable<String>{
